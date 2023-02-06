@@ -1,0 +1,827 @@
+<phyphox xmlns="http://phyphox.org/xml" version="1.7" locale="en">
+    <title>Walk the Graph: Distance-Time</title>
+    <icon>2</icon>
+    <category>ToF Distance Sensor</category>
+    <description>
+        ToF Distance Sensor with walk the graph game
+    </description>
+    <data-containers>
+        <container size="1" static="false">button</container>
+
+        <container size="2">tpreview</container>
+        <container size="1">lastx</container>
+        <container size="2">preview</container>
+
+        <container size="0">xin</container>
+        <container size="0">tin</container>
+        <container size="1">tlast</container>
+        <container size="1">tinfirst</container>
+        <container size="1">newoffset</container>
+        <container size="1" init="-1000">offset</container>
+        <container size="0">tcorrected</container>
+        <container size="0">x</container>
+        <container size="0">t</container>
+        <container size="0">xshow</container>
+        <container size="0">tshow</container>
+
+        <container size="1" init="0.1">dt</container> <!-- Step size for smoothing -->
+        <container size="1" init="0.5">d</container>  <!-- Width for smoothing in seconds -->
+
+        <container size="0">tout</container>
+        <container size="0">xout</container>
+        <container size="0">vout</container>
+        <container size="0">aout</container>
+
+        <container size="0">toutpreview</container>
+        <container size="0">xoutpreview</container>
+        <container size="0">voutpreview</container>
+        <container size="0">aoutpreview</container>
+
+        <container size="1" init="0" static="true">graph1_start</container>
+        <container size="1" init="15" static="true">graph1_stop</container>
+        <container size="0" static="true">graph1_time</container>
+        <container size="0" static="true">graph1</container>
+
+        <container size="1" init="0" static="true">graph2_start</container>
+        <container size="1" init="10" static="true">graph2_stop</container>
+        <container size="0" static="true">graph2_time</container>
+        <container size="0" static="true">graph2</container>
+
+        <container size="1" init="0" static="true">graph3_start</container>
+        <container size="1" init="16" static="true">graph3_stop</container>
+        <container size="0" static="true">graph3_time</container>
+        <container size="0" static="true">graph3</container>
+
+        <container size="1" init="0" static="true">graph4_start</container>
+        <container size="1" init="16" static="true">graph4_stop</container>
+        <container size="0" static="true">graph4_time</container>
+        <container size="0" static="true">graph4</container>
+
+        <container size="1" init="0" static="true">graph5_start</container>
+        <container size="1" init="15" static="true">graph5_stop</container>
+        <container size="0" static="true">graph5_time</container>
+        <container size="0" static="true">graph5</container>
+
+        <container size="1" init="0" static="true">graph6_start</container>
+        <container size="1" init="15" static="true">graph6_stop</container>
+        <container size="0" static="true">graph6_time</container>
+        <container size="0" static="true">graph6</container>
+
+        <container size="1" init="0" static="true">graph7_start</container>
+        <container size="1" init="15" static="true">graph7_stop</container>
+        <container size="0" static="true">graph7_time</container>
+        <container size="0" static="true">graph7</container>
+
+        <container size="1" init="0" static="true">graph8_start</container>
+        <container size="1" init="15" static="true">graph8_stop</container>
+        <container size="0" static="true">graph8_time</container>
+        <container size="0" static="true">graph8</container>
+
+        <container size="1" init="0" static="true">graph9_start</container>
+        <container size="1" init="16" static="true">graph9_stop</container>
+        <container size="0" static="true">graph9_time</container>
+        <container size="0" static="true">graph9</container>
+
+        <container size="1" init="1">plotselect</container>
+        <container size="0">reference_plot_time</container>
+        <container size="0">reference_plot</container>
+
+        <container size="1">newsmoothstart</container>
+        <container size="1">newsmoothstop</container>
+        <container size="1">tmaxsmooth</container>
+
+        <container size="101">newsmoothti100</container>
+        <container size="101">newsmoothti</container>
+        <container size="101">newsmoothxi</container>
+        <container size="101">newsmoothvi</container>
+        <container size="101">newsmoothai</container>
+
+        <container size="101">incompletesmoothti</container>
+        <container size="101">incompletesmoothxi</container>
+        <container size="101">incompletesmoothvi</container>
+        <container size="101">incompletesmoothai</container>
+
+        <container size="1">temp</container>
+
+        <container size="0">scorable_time</container>
+        <container size="0">scorable_data</container>
+        <container size="0">scorable_ref</container>
+        <container size="0">scores</container>
+        <container size="1">score</container>
+    </data-containers>
+    <input>
+        <bluetooth name="Distance Sensor" mode="notification" subscribeOnStart="false">
+            <output char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian">xin</output>
+            <output char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8">tin</output>
+            <output char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="12">button</output>
+        </bluetooth>
+    </input>
+    <analysis>
+
+        <!-- VORSCHAU DER POSITION -->
+
+        <append>
+            <input clear="false">xin</input>
+            <output clear="false">lastx</output>
+        </append>
+
+        <append>
+            <input clear="false">reference_plot_time</input>
+            <input type="value">0</input>
+            <output clear="false">tpreview</output>
+        </append>
+
+        <append>
+            <input clear="false">lastx</input>
+            <input clear="false">lastx</input>
+            <output clear="false">preview</output>
+        </append>
+
+        <!-- VORGABE-KURVE -->
+
+        <!-- Graph 1 -->
+
+        <formula formula="([2]-[1])/[3]+1">
+            <input clear="false">graph1_start</input>
+            <input clear="false">graph1_stop</input>
+            <input clear="false">dt</input>
+            <output>temp</output>
+        </formula>
+
+        <ramp>
+            <input as="start" clear="false">graph1_start</input>
+            <input as="stop" clear="false">graph1_stop</input>
+            <input as="length">temp</input>
+            <output>graph1_time</output>
+        </ramp>
+
+        <formula formula="1500 - (min(max([1_],0),6)-0)/(6-0)*700 - (min(max([1_],9),15)-9)/(15-9)*700">              <!-- Formel für die Vorgabekurve. Normalerweise muss nur diese Zeile geändert werden. Start und Stop weiter oben <data-containers> ändern. -->
+            <input clear="false">graph1_time</input>
+            <output>graph1</output>
+        </formula>
+
+        <!-- Graph 2 -->
+
+        <formula formula="([2]-[1])/[3]+1">
+            <input clear="false">graph2_start</input>
+            <input clear="false">graph2_stop</input>
+            <input clear="false">dt</input>
+            <output>temp</output>
+        </formula>
+
+        <ramp>
+            <input as="start" clear="false">graph2_start</input>
+            <input as="stop" clear="false">graph2_stop</input>
+            <input as="length">temp</input>
+            <output>graph2_time</output>
+        </ramp>
+
+        <formula formula="200 + (min(max([1_],0),4)-0)/(4-0)*1200 - (min(max([1_],6),10)-6)/(10-6)*1200">
+            <input clear="false">graph2_time</input>
+            <output>graph2</output>
+        </formula>
+
+        <!-- Graph 3 -->
+
+        <formula formula="([2]-[1])/[3]+1">
+            <input clear="false">graph3_start</input>
+            <input clear="false">graph3_stop</input>
+            <input clear="false">dt</input>
+            <output>temp</output>
+        </formula>
+
+        <ramp>
+            <input as="start" clear="false">graph3_start</input>
+            <input as="stop" clear="false">graph3_stop</input>
+            <input as="length">temp</input>
+            <output>graph3_time</output>
+        </ramp>
+
+        <formula formula="1500 - (min(max([1_],0),8)-0)/(8-0)*1200 + (min(max([1_],8),16)-8)/(16-8)*800">  <!-- Formel für die Vorgabekurve. Normalerweise muss nur diese Zeile geändert werden. Start und Stop weiter oben <data-containers> ändern. -->
+            <input clear="false">graph3_time</input>
+            <output>graph3</output>
+        </formula>
+
+        <!-- Graph 4 -->
+
+        <formula formula="([2]-[1])/[3]+1">
+            <input clear="false">graph4_start</input>
+            <input clear="false">graph4_stop</input>
+            <input clear="false">dt</input>
+            <output>temp</output>
+        </formula>
+
+        <ramp>
+            <input as="start" clear="false">graph4_start</input>
+            <input as="stop" clear="false">graph4_stop</input>
+            <input as="length">temp</input>
+            <output>graph4_time</output>
+        </ramp>
+
+        <formula formula="1400 - (min(max([1_],0),4)-0)/(4-0)*1200 + (min(max([1_],4),8)-4)/(8-4)*1200 - (min(max([1_],8),12)-8)/(12-8)*1200 + (min(max([1_],12),16)-12)/(16-12)*1200"> <!-- Formel für die Vorgabekurve. Normalerweise muss nur diese Zeile geändert werden. Start und Stop weiter oben <data-containers> ändern. -->
+            <input clear="false">graph4_time</input>
+            <output>graph4</output>
+        </formula>
+
+        <!-- Graph 5 -->
+
+        <formula formula="([2]-[1])/[3]+1">
+            <input clear="false">graph5_start</input>
+            <input clear="false">graph5_stop</input>
+            <input clear="false">dt</input>
+            <output>temp</output>
+        </formula>
+
+        <ramp>
+            <input as="start" clear="false">graph5_start</input>
+            <input as="stop" clear="false">graph5_stop</input>
+            <input as="length">temp</input>
+            <output>graph5_time</output>
+        </ramp>
+
+        <formula formula="(7.16*([1_]+1.15)^2)-(124*([1_]+1.15))+636">              <!-- Formel für die Vorgabekurve. Normalerweise muss nur diese Zeile geändert werden. Start und Stop weiter oben <data-containers> ändern. -->
+            <input clear="false">graph5_time</input>
+            <output>graph5</output>
+        </formula>
+
+        <!-- Graph 6 -->
+
+        <formula formula="([2]-[1])/[3]+1">
+            <input clear="false">graph6_start</input>
+            <input clear="false">graph6_stop</input>
+            <input clear="false">dt</input>
+            <output>temp</output>
+        </formula>
+
+        <ramp>
+            <input as="start" clear="false">graph6_start</input>
+            <input as="stop" clear="false">graph6_stop</input>
+            <input as="length">temp</input>
+            <output>graph6_time</output>
+        </ramp>
+
+        <formula formula="(-5.3*([1_]-7.5)^2)+1200">
+            <input clear="false">graph6_time</input>
+            <output>graph6</output>
+        </formula>
+
+        <!-- Graph 7 -->
+
+        <formula formula="([2]-[1])/[3]+1">
+            <input clear="false">graph7_start</input>
+            <input clear="false">graph7_stop</input>
+            <input clear="false">dt</input>
+            <output>temp</output>
+        </formula>
+
+        <ramp>
+            <input as="start" clear="false">graph7_start</input>
+            <input as="stop" clear="false">graph7_stop</input>
+            <input as="length">temp</input>
+            <output>graph7_time</output>
+        </ramp>
+
+        <formula formula="(500*sin(63.457*[1_]-161.75))+650">  <!-- Formel für die Vorgabekurve. Normalerweise muss nur diese Zeile geändert werden. Start und Stop weiter oben <data-containers> ändern. -->
+            <input clear="false">graph7_time</input>
+            <output>graph7</output>
+        </formula>
+
+        <!-- Graph 8 -->
+
+        <formula formula="([2]-[1])/[3]+1">
+            <input clear="false">graph8_start</input>
+            <input clear="false">graph8_stop</input>
+            <input clear="false">dt</input>
+            <output>temp</output>
+        </formula>
+
+        <ramp>
+            <input as="start" clear="false">graph8_start</input>
+            <input as="stop" clear="false">graph8_stop</input>
+            <input as="length">temp</input>
+            <output>graph8_time</output>
+        </ramp>
+
+        <formula formula="(700*sin(63.457*[1_]-161.75))+750">  <!-- Formel für die Vorgabekurve. Normalerweise muss nur diese Zeile geändert werden. Start und Stop weiter oben <data-containers> ändern. -->
+            <input clear="false">graph8_time</input>
+            <output>graph8</output>
+        </formula>
+
+        <!-- Graph 9 -->
+
+        <formula formula="([2]-[1])/[3]+1">
+            <input clear="false">graph9_start</input>
+            <input clear="false">graph9_stop</input>
+            <input clear="false">dt</input>
+            <output>temp</output>
+        </formula>
+
+        <ramp>
+            <input as="start" clear="false">graph9_start</input>
+            <input as="stop" clear="false">graph9_stop</input>
+            <input as="length">temp</input>
+            <output>graph9_time</output>
+        </ramp>
+
+        <formula formula="(500*sin(1.57*[1_]+155.5))+650">  <!-- Formel für die Vorgabekurve. Normalerweise muss nur diese Zeile geändert werden. Start und Stop weiter oben <data-containers> ändern. -->
+            <input clear="false">graph9_time</input>
+            <output>graph9</output>
+        </formula>
+
+        <!-- Auswahl des Nutzers (linear, sinus, piecewise) übernehmen -->
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">1</input>
+            <input clear="false">graph1</input>
+            <output clear="true">reference_plot</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">1</input>
+            <input clear="false">graph1_time</input>
+            <output clear="true">reference_plot_time</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">2</input>
+            <input clear="false">graph2</input>
+            <output clear="true">reference_plot</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">2</input>
+            <input clear="false">graph2_time</input>
+            <output clear="true">reference_plot_time</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">3</input>
+            <input clear="false">graph3</input>
+            <output clear="true">reference_plot</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">3</input>
+            <input clear="false">graph3_time</input>
+            <output clear="true">reference_plot_time</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">4</input>
+            <input clear="false">graph4</input>
+            <output clear="true">reference_plot</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">4</input>
+            <input clear="false">graph4_time</input>
+            <output clear="true">reference_plot_time</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">5</input>
+            <input clear="false">graph5</input>
+            <output clear="true">reference_plot</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">5</input>
+            <input clear="false">graph5_time</input>
+            <output clear="true">reference_plot_time</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">6</input>
+            <input clear="false">graph6</input>
+            <output clear="true">reference_plot</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">6</input>
+            <input clear="false">graph6_time</input>
+            <output clear="true">reference_plot_time</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">7</input>
+            <input clear="false">graph7</input>
+            <output clear="true">reference_plot</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">7</input>
+            <input clear="false">graph7_time</input>
+            <output clear="true">reference_plot_time</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">8</input>
+            <input clear="false">graph8</input>
+            <output clear="true">reference_plot</output>
+        </if>
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">8</input>
+            <input clear="false">graph8_time</input>
+            <output clear="true">reference_plot_time</output>
+        </if>
+
+
+        <if equal="true">
+            <input clear="false">plotselect</input>
+            <input type="value">9</input>
+            <input clear="false">graph9</input>
+            <output clear="true">reference_plot</output>
+        </if>
+
+        <if equal="true">
+            <input clear="true">plotselect</input>
+            <input type="value">9</input>
+            <input clear="false">graph9_time</input>
+            <output clear="true">reference_plot_time</output>
+        </if>
+
+        <!-- MESSWERTE -->
+
+        <!-- Ersten Wert auf Null setzen und Button berücksichtigen -->
+
+        <first>
+            <input clear="false">tin</input>
+            <output>tinfirst</output>           <!-- First timestamp of new data from Arduino. This is in units of the Arduino and will have an offset -->
+        </first>
+
+        <append>
+            <input type="value">-3</input>      <!-- Startzeit für den allerersten Datenpunkt -->
+            <input clear="false">t</input>
+            <output>tlast</output>              <!-- Last timestamp already stored or start value. This is in units of the x axis -->
+        </append>
+
+        <formula formula="[1]-[2]-0.05">
+            <input clear="false">tinfirst</input>
+            <input clear="false">tlast</input>
+            <output clear="true">newoffset</output>    <!-- Possible new offset to continue existing data if there is no valid offset -->
+        </formula>
+
+        <if less="true">
+            <input clear="false">offset</input>
+            <input type="value">-100</input>
+            <input clear="false">newoffset</input>      <!-- Set offset to newoffset if it is no longer valid -->
+            <output clear="false">offset</output>
+        </if>
+
+        <subtract>
+            <input clear="true">tin</input>
+            <input clear="false">offset</input>
+            <output clear="true">tcorrected</output>    <!-- Timestamps corresponding to xin data, aligned such that it continues any previous measurement. -->
+        </subtract>
+
+        <if equal="true">
+            <input clear="false">button</input>
+            <input type="value">0</input>
+            <input type="value">-1000</input>
+            <output clear="false">offset</output>       <!-- If the button is not pressed, reset the offset -->
+        </if>
+
+        <if equal="true">
+            <input clear="false">button</input>
+            <input type="value">0</input>
+            <input type="empty" />
+            <output clear="true">tcorrected</output>    <!-- If the button is not pressed, clear incoming data -->
+        </if>
+
+        <if equal="true">
+            <input clear="false">button</input>
+            <input type="value">0</input>
+            <input type="empty" />
+            <output clear="true">xin</output>           <!-- If the button is not pressed, clear incoming data -->
+        </if>
+
+        <append>
+            <input clear="true">xin</input>
+            <output clear="false">x</output>            <!-- Append new data if it is still there... -->
+        </append>
+
+        <append>
+            <input clear="true">tcorrected</input>
+            <output clear="false">t</output>            <!-- Append new data if it is still there... -->
+        </append>
+
+        <!-- Neue Stützstellen für Glättung suchen -->
+
+        <append>
+            <input type="value">0</input>
+            <input clear="false">tout</input>
+            <output>temp</output>               <!-- Letzter schon berechneter Glättungswert -->
+        </append>
+
+        <add>
+            <input>temp</input>
+            <input clear="false">dt</input>
+            <output>newsmoothstart</output>     <!-- Erster zu berechnender Glättungswert -->
+        </add>
+
+        <append>
+            <input type="value">0</input>
+            <input clear="false">t</input>
+            <output>temp</output>               <!-- Letzter Rohdatenwert, der schon aufgenommen wurde -->
+        </append>
+
+        <subtract>
+            <input>temp</input>
+            <input clear="false">d</input>
+            <output>tmaxsmooth</output>         <!-- Maximale Zeit, bis zu der eine Glättung schon sinnvoll wäre -->
+        </subtract>
+
+        <formula formula="[1]+100*[2]">
+            <input clear="false">newsmoothstart</input>
+            <input clear="false">dt</input>
+            <output>newsmoothstop</output>      <!-- Höchster der möglichen neuen Glättungswerte, der aber weit hinter den sinnvollen liegen kann -->
+        </formula>
+
+        <ramp>
+            <input as="start">newsmoothstart</input>
+            <input as="stop">newsmoothstop</input>
+            <output>newsmoothti100</output>     <!-- Mögliche neue Glättungswerte -->
+        </ramp>
+
+        <rangefilter>
+            <input clear="false">newsmoothti100</input>
+            <input as="max" clear="false">tmaxsmooth</input>
+            <output>newsmoothti</output>        <!-- Die Zeiten, zu denen wir nun wirklich glätten -->
+        </rangefilter>
+
+        <append>
+            <input type="value">0</input>
+            <input clear="false">t</input>
+            <output>temp</output>               <!-- Erneut letzter Rohdatenwert, der schon aufgenommen wurde -->
+        </append>
+
+        <rangefilter>
+            <input>newsmoothti100</input>
+            <input as="min" clear="false">tmaxsmooth</input>
+            <input as="max">temp</input>
+            <output>incompletesmoothti</output>        <!-- Die Zeiten für neuere Datenpunkt, die wir nur als Vorschau glätten -->
+        </rangefilter>
+
+        <!-- Glätten -->
+
+        <loess>
+            <input as="x" clear="false">t</input>
+            <input as="y" clear="false">x</input>
+            <input as="xi" clear="false">newsmoothti</input>
+            <input as="d" clear="false">d</input>
+            <output as="yi0">newsmoothxi</output>
+            <output as="yi1">newsmoothvi</output>
+            <output as="yi2">newsmoothai</output>
+        </loess>
+
+        <loess>
+            <input as="x" clear="false">t</input>
+            <input as="y" clear="false">x</input>
+            <input as="xi" clear="false">incompletesmoothti</input>
+            <input as="d" clear="false">d</input>
+            <output as="yi0">incompletesmoothxi</output>
+            <output as="yi1">incompletesmoothvi</output>
+            <output as="yi2">incompletesmoothai</output>
+        </loess>
+
+        <!-- Ergebnisse anhängen -->
+
+        <append>
+            <input>newsmoothti</input>
+            <output clear="false">tout</output>
+        </append>
+
+        <append>
+            <input>newsmoothxi</input>
+            <output clear="false">xout</output>
+        </append>
+
+        <append>
+            <input>newsmoothvi</input>
+            <output clear="false">vout</output>
+        </append>
+
+        <append>
+            <input>newsmoothai</input>
+            <output clear="false">aout</output>
+        </append>
+
+        <!-- Puffer mit finalen Ergebnissen und Vorschau-Ergebnissen -->
+
+        <append>
+            <input clear="false">tout</input>
+            <input clear="true">incompletesmoothti</input>
+            <output clear="true">toutpreview</output>
+        </append>
+
+        <append>
+            <input clear="false">xout</input>
+            <input clear="true">incompletesmoothxi</input>
+            <output clear="true">xoutpreview</output>
+        </append>
+
+        <append>
+            <input clear="false">vout</input>
+            <input clear="true">incompletesmoothvi</input>
+            <output clear="true">voutpreview</output>
+        </append>
+
+        <append>
+            <input clear="false">aout</input>
+            <input clear="true">incompletesmoothai</input>
+            <output clear="true">aoutpreview</output>
+        </append>
+
+        <!-- SCORE -->
+
+        <rangefilter>
+            <input clear="false">reference_plot_time</input>            <!-- Limit the time datapoints for the score to the reference times within the range of already gathered data -->
+            <input as="max" clear="true">tmaxsmooth</input>
+            <input clear="false">reference_plot</input>
+            <output>scorable_time</output>
+            <output>scorable_ref</output>
+        </rangefilter>
+
+        <interpolate method="linear">
+            <input clear="false" as="x">tout</input>
+            <input clear="false" as="y">xout</input>
+            <input clear="false" as="xi">scorable_time</input>          <!-- Interpolate data points from the user in the places of the reference curve --> 
+            <output>scorable_data</output>
+        </interpolate>
+
+        <formula formula="min(max((50-abs([1_]-[2_])+10)/50, 0),1)">      <!-- (50-...+10)/50 sorgt dafür, dass es ab 6 cm Abstand 0 Punkt gibt und bei 1 cm Abstand die volle Punktzahl von 1 Punkt. Min und max verhindern, dass der Wert kleiner 0 oder größer 1 wird. -->
+            <input clear="false">scorable_data</input>
+            <input clear="false">scorable_ref</input>
+            <output>scores</output>                                     <!-- Assign a score in the range of 0 to 1 to each compared point. -->
+        </formula>
+
+        <average>
+            <input clear="false">scores</input>                         <!-- Final score is the average of individual scores -->
+            <output as="average">score</output>
+        </average>
+
+        <append>
+            <input clear="false">t</input>
+            <output>tshow</output>
+        </append>
+
+        <append>
+            <input clear="false">x</input>
+            <output>xshow</output>
+        </append>
+
+        <!-- Fill some graphs with empty data to allow plotting if we do not yet have data -->
+
+        <count>
+            <input clear="false">toutpreview</input>
+            <output>temp</output>
+        </count>
+
+        <if less="true">
+            <input clear="false">temp</input>
+            <input type="value">1</input>
+            <input type="value">0</input>
+            <output clear="false">toutpreview</output>
+        </if>
+
+        <if less="true">
+            <input clear="false">temp</input>
+            <input type="value">1</input>
+            <input type="value">0</input>
+            <output clear="false">xoutpreview</output>
+        </if>
+
+        <count>
+            <input clear="false">tshow</input>
+            <output>temp</output>
+        </count>
+
+        <if less="true">
+            <input clear="false">temp</input>
+            <input type="value">1</input>
+            <input type="value">0</input>
+            <output clear="false">tshow</output>
+        </if>
+
+        <if less="true">
+            <input clear="false">temp</input>
+            <input type="value">1</input>
+            <input type="value">0</input>
+            <output clear="false">xshow</output>
+        </if>
+
+    </analysis>
+    <views>
+        <view label="Line Walk">
+            <value label="Distance-Time Score" size="2" precision="0" unit="%" factor="100">
+                <input>score</input>
+            </value>
+            <button label="Restart">
+                <input type="value">-1000</input>
+                <output>offset</output>
+                <input type="empty" />
+                <output>t</output>
+                <input type="empty" />
+                <output>x</output>
+                <input type="empty" />
+                <output>tout</output>
+                <input type="empty" />
+                <output>xout</output>
+                <input type="empty" />
+                <output>vout</output>
+                <input type="empty" />
+                <output>aout</output>
+            </button>
+            <graph label="Distance Time Graph" partialUpdate="false" labelX="Time" labelY="Distance" unitX="s" precisionX="0" unitY="mm" scaleMinX="fixed" minX="-3" scaleMaxX="fixed" maxX="17" scaleMinY="fixed" minY="0" scaleMaxY="fixed" maxY="1600" aspectRatio="1.5">
+                <input axis="x" lineWidth="2">toutpreview</input>
+                <input axis="y">xoutpreview</input>
+                <input axis="x" style="dots" color="white">tshow</input>
+                <input axis="y">xshow</input>
+                <input axis="x" color="green">reference_plot_time</input>
+                <input axis="y">reference_plot</input>
+                <input axis="x" color="yellow">tpreview</input>
+                <input axis="y">preview</input>
+            </graph>
+        </view>
+	
+	<view label="Distance Time">
+		<graph label="Distance" labelX="time" labelY="distance" unitX="s" unitY="mm">
+			<input axis="x">tshow</input>
+			<input axis="y">xshow</input>
+		</graph>
+	</view>
+
+        <view label="Setup">
+            <separator height="0.5" />
+            <info label="Linear Graphs" size="1.5" bold="true" />
+            <separator height="0.5" />
+            <button label="Graph 1">
+                <input type="value">1</input>
+                <output>plotselect</output>
+            </button>
+            <button label="Graph 2">
+                <input type="value">2</input>
+                <output>plotselect</output>
+            </button>
+            <button label="Graph 3">
+                <input type="value">3</input>
+                <output>plotselect</output>
+            </button>
+            <button label="Graph 4">
+                <input type="value">4</input>
+                <output>plotselect</output>
+            </button>
+            <separator height="1" />
+            <info label="Parabolics" size="1.5" bold="true" />
+            <separator height="0.5" />
+            <button label="Graph 5">
+                <input type="value">5</input>
+                <output>plotselect</output>
+            </button>
+            <button label="Graph 6">
+                <input type="value">6</input>
+                <output>plotselect</output>
+            </button>
+            <separator height="1" />
+            <info label="Periodic Graphs" size="1.5" bold="true" />
+            <separator height="0.5" />
+            <button label="Graph 7">
+                <input type="value">7</input>
+                <output>plotselect</output>
+            </button>
+            <button label="Graph 8">
+                <input type="value">8</input>
+                <output>plotselect</output>
+            </button>
+            <button label="Graph 9">
+                <input type="value">9</input>
+                <output>plotselect</output>
+            </button>
+        </view>
+    </views>
+    <export>
+        <set name="Data">
+            <data name="t">tout</data>
+            <data name="s">xout</data>
+            <data name="v">vout</data>
+            <data name="a">aout</data>
+        </set>
+    </export>
+</phyphox>
