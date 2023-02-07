@@ -42,6 +42,8 @@ Navigate to the [wiki](https://github.com/RGill-1/Bluetooth-Science-Sensors/wiki
 
 This device uses the Sensiron SCD41 photoacousitic sensor to detect CO2 levels within a range of 400 - 5,000 ppm. With a data rate of one reading every 5s and a manufacturer claimed accuracy of +/- (40ppm + 5% of reading).
 
+The current design works by compression fitting on a coffee jar. The build guide would open: finish a 200g jar of M&S Gold coffee. With the students we are looking at a new lid mechanism to try to be more universal.
+
 Navigate to the wiki page for the Build Guide and example experiments.
 
 ### **Light Sensor**
