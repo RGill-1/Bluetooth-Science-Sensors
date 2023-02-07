@@ -38,6 +38,7 @@ Uses an INA219 chip to measure current and a seperate ADS1015 ADC with potential
 Navigate to the [wiki](https://github.com/RGill-1/Bluetooth-Science-Sensors/wiki/5.-Volt-Ammeter) page for the Build Guide and example experiments.
 
 ### **Carbon Dioxide Sensor**
+![](/Media/CO2SensorBanner.jpg)
 
 This device uses the Sensiron SCD41 photoacousitic sensor to detect CO2 levels within a range of 400 - 5,000 ppm. With a data rate of one reading every 5s and a manufacturer claimed accuracy of +/- (40ppm + 5% of reading).
 
