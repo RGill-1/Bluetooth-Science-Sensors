@@ -1,6 +1,6 @@
 # Bluetooth Sensors for the Science Classroom
 
-![](/Media/CO2%20Sensor%20Jar.png)![](/Media/Distance%20Sensor%20Fusion.png)![](/Media/VAmeter%20Phyphox.png)
+![](/Media/IntroBanner.png)
 
 Inspired by the CLEAPSS Arduino build guides I have been working on ESP32 based devices with off the shelf sensors to help in the teaching of science. Thanks to a school grant from the Institute of Physics (IOP) I have now started working with students in an extra-curricular club to give them a chance to participate in the development of these devices.
 
