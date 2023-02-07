@@ -30,6 +30,7 @@ There is an implementation of a 'Walk the Line' game based on code written by Do
 Navigate to the [wiki](https://github.com/RGill-1/Bluetooth-Science-Sensors/wiki/4.-Distance-Sensor) page for the Build Guide and example experiments.
 
 ### **Volt/Ammeter**
+![](/Media/VASensorbanner.jpg)
 
 Uses an INA219 chip to measure current and a seperate ADS1015 ADC with potential divider onboard for potential difference. This device is capable of simultaeously measuring those quantities and plotting them against time and/or each other. Resolution of 1mA and 10mV respectively with a range of 0-3.2A and 0-18V. Data rate of ~100Hz.
 
