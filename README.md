@@ -47,6 +47,7 @@ The current design works by compression fitting on a coffee jar. The build guide
 Navigate to the wiki page for the Build Guide and example experiments.
 
 ### **Light Sensor**
+![](/Media/LightSensor3dPrints.jpg)
 
 An onboard VEML7700 light sensor detects light intensity between 0 - ~120,00 lux. This sensor uses the same case as the distance sensor with a new lid and component tray to be printed.
 
