@@ -22,6 +22,7 @@ The challenge I have given the students:
 ## Progress so far
 
 ### **Distance Sensor**
+![](/Media/DistanceSensorBanner.png)
 
 Based on ST's VL53L1X time of flight sensor this device gives distance against time measurements from 0 to ~180cm  at a data rate of up to 50 Hz (max range higher at lower data rate). Also outputs velocity and acceleration against time.
 
