@@ -2,7 +2,7 @@
 
 ![](/Media/IntroBanner.png)
 
-Inspired by the CLEAPSS Arduino build guides I have been working on ESP32 based devices with off the shelf sensors to help in the teaching of science. Thanks to a school grant from the Institute of Physics (IOP) I have now started working with students in an extra-curricular club to give them a chance to participate in the development of these devices.
+Inspired by the CLEAPSS Arduino build guides I have been working on ESP32 based devices with off the shelf sensors. The motivation is two-fold; firstly the devices are ones we might not otherwise have and so this project enables us to do novel demos to help explain the underlying science. Secondly, thanks to a school grant from the Institute of Physics (IOP) I have started working with students in an extra-curricular club to give them a chance to participate in the development of these devices. This will hopefully give them a solid real life project in which to try their hand at product development.
 
 This repository is a record of where I have got to at this stage. The students work in a seperate repo which we will merge at some future date. Much of the wiki here is written with students, and any teachers who wish to work with students in a similar manner, in mind.
 
