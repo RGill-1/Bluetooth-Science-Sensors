@@ -1,0 +1,11 @@
+2x 3mm IR breakbeam sensors
+https://thepihut.com/products/ir-break-beam-sensor-3mm-leds
+
+1x Adafruit ESP32v2 Feather Board
+https://thepihut.com/products/adafruit-esp32-feather-v2-8mb-flash-2-mb-psram-stemma-qt
+
+1x Grove protoshield, mini breadboard which means we dont solder direct to the esp32 board
+https://thepihut.com/products/grove-proto-shield
+
+1x Grove to stemma cable - connects the proto shield to the esp32 board - hence why we use i2c pins for the data pins of IR break beams
+https://thepihut.com/products/grove-to-stemma-qt-qwiic-jst-sh-cable-100mm-long
